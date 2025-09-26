@@ -8,8 +8,8 @@ import java.util.Date;
 
 public interface ReizigerDAO {
     boolean save(Reiziger reiziger) throws SQLException;
-    boolean update(Reiziger reiziger);
-    boolean delete(Reiziger reiziger);
+    boolean update(Reiziger reiziger) throws SQLException;
+    boolean delete(Reiziger reiziger) throws SQLException;
     Reiziger findById(int id);
     List<Reiziger> findByGbdatum(Date geboortedatum);
     List<Reiziger> findAll();

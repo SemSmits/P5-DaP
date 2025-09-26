@@ -79,4 +79,54 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO {
         }
         return list;
     }
+
+    @Override
+    public List<OVChipkaart> findAll() {
+        List<OVChipkaart> list = new ArrayList<>();
+
+        final String sql = """
+        SELECT k.kaart_nummer, k.geldig_tot, k.klasse, k.saldo,
+               r.reiziger_id, r.voorletters, r.tussenvoegsel, r.achternaam, r.geboortedatum
+        FROM ov_chipkaart k
+        LEFT JOIN reiziger r ON r.reiziger_id = k.reiziger_id
+        ORDER BY k.kaart_nummer
+    """;
+
+        try (PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Reiziger r = null;
+                int rid = rs.getInt("reiziger_id");
+                if (!rs.wasNull()) {
+                    r = new Reiziger(
+                            rid,
+                            rs.getString("voorletters"),
+                            rs.getString("tussenvoegsel"),
+                            rs.getString("achternaam"),
+                            rs.getDate("geboortedatum")
+                    );
+                }
+
+                OVChipkaart k = new OVChipkaart(
+                        rs.getInt("kaart_nummer"),
+                        rs.getDate("geldig_tot"),
+                        rs.getInt("klasse"),
+                        rs.getDouble("saldo")
+                );
+
+                // Koppel de reiziger aan de kaart (indien aanwezig)
+                if (r != null) {
+                    k.setReiziger(r);
+                    r.addOVChipkaart(k);
+                }
+
+                list.add(k);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
 }

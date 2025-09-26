@@ -67,7 +67,9 @@ public class Reiziger {
 
         String kaartSummary = kaarten.isEmpty()
                 ? ", kaarten=[]"
-                : ", kaarten=" + kaarten.stream().map(k -> "#" + k.getKaartNummer()).toList();
+                : ", kaarten=" + kaarten.stream()
+                .map(OVChipkaart::toString)
+                .toList();
 
         return "Reiziger {" +
                 "#" + id +
